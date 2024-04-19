@@ -1,18 +1,16 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { authMiddleware } from "@clerk/nextjs";
 
-const protectedRoute = createRouteMatcher([
-  '/',
-  '/upcoming',
-  '/meeting(.*)',
-  '/previous',
-  '/recordings',
-  '/personal-room',
-]);
-
-export default clerkMiddleware((auth, req) => {
-  if (protectedRoute(req)) auth().protect();
+export default authMiddleware({
+  publicRoutes: ["/sign-in", "/sign-out"],
+  ignoredRoutes: ["/sign-in", "/sign-out"],
 });
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    // Exclude files with a "." followed by an extension, which are typically static files.
+    // Exclude files in the _next directory, which are Next.js internals.
+    "/((?!.+\\.[\\w]+$|_next).*)",
+    // Re-include any files in the api or trpc folders that might have an extension
+    "/(api|trpc)(.*)",
+  ],
 };
